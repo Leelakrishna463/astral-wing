@@ -1,4 +1,6 @@
 # Prerequisite: docker network create caddy-network
+name: homelab
+
 
 services:
   caddy-server:
@@ -33,8 +35,6 @@ services:
       - DOMAIN=https://vault.example.lan  # TODO: your real Caddy URL
     networks:
       - caddy-network
-    ports:
-      - "8080:80"  # TODO: remove once Caddy proxies to vault-warden:80
     volumes:
       - /mnt/docker/volumes/vault-warden/data:/data
 
