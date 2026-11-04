@@ -2,6 +2,8 @@
 
 services:
   caddy-server:
+    env_file:
+      - .env
     build:
       context: .
       dockerfile: CaddyBuilderDockerfile
@@ -17,7 +19,7 @@ services:
     cap_add:
       - NET_ADMIN
     volumes:
-      - /mnt/docker/volumes/caddy-volume/conf:/etc/caddy:ro
+      - /mnt/docker/stacks/:/etc/caddy:ro
       - /mnt/docker/volumes/caddy-volume/data:/data
       - /mnt/docker/volumes/caddy-volume/config:/config
       - /mnt/docker/volumes/caddy-volume/site:/srv
@@ -62,4 +64,4 @@ services:
 
 networks:
   caddy-network:
-    external: true
+    driver: bridge

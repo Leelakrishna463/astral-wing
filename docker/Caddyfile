@@ -1,0 +1,6 @@
+{$CUSTOM_CADDY_DOMAIN} {
+    tls {
+        dns duckdns {$DUCKDNS_TOKEN}
+    }
+    reverse_proxy {$REVERSE_PROXY_IP_PORT}
+}
