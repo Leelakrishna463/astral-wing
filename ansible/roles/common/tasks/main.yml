@@ -1,0 +1,29 @@
+- name: Base packages
+  ansible.builtin.apt:
+    name: [qemu-guest-agent, unattended-upgrades, ca-certificates, curl, python3-debian]
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: Guest agent running
+  ansible.builtin.service:
+    name: qemu-guest-agent
+    state: started
+
+- name: Automatic security updates
+  ansible.builtin.copy:
+    dest: /etc/apt/apt.conf.d/20auto-upgrades
+    content: |
+      APT::Periodic::Update-Package-Lists "1";
+      APT::Periodic::Unattended-Upgrade "1";
+    mode: "0644"
+
+- name: Timezone
+  community.general.timezone:
+    name: Asia/Kolkata
+
+- name: No global IPv6
+  ansible.builtin.template:
+    src: 99-no-ipv6.yaml.j2
+    dest: /etc/netplan/99-no-ipv6.yaml
+    mode: "0600"
+  notify: Apply netplan

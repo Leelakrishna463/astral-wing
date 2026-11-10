@@ -1,0 +1,5 @@
+- name: Docker VM base
+  hosts: docker_hosts
+  roles:
+    - common
+    - docker

@@ -1,0 +1,6 @@
+network:
+  version: 2
+  ethernets:
+    {{ ansible_facts['default_ipv4']['interface'] }}:
+      dhcp6: false
+      accept-ra: false
