@@ -21,7 +21,7 @@ services:
     cap_add:
       - NET_ADMIN
     volumes:
-      - /mnt/docker/stacks/:/etc/caddy:ro
+      - ./caddy:/etc/caddy:ro
       - /mnt/docker/volumes/caddy-volume/data:/data
       - /mnt/docker/volumes/caddy-volume/config:/config
       - /mnt/docker/volumes/caddy-volume/site:/srv
@@ -32,7 +32,7 @@ services:
     restart: unless-stopped
     environment:
       - SIGNUPS_ALLOWED=false
-      - DOMAIN=https://vault.example.lan  # TODO: your real Caddy URL
+      - DOMAIN=https://${CUSTOM_CADDY_DOMAIN}
     networks:
       - caddy-network
     volumes:
