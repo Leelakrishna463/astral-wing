@@ -1,0 +1,62 @@
+- name: Load VM secrets
+  community.sops.load_vars:
+    file: "{{ playbook_dir }}/../secrets/vm.sops.yaml"
+    name: vm_secrets
+  no_log: true
+
+- name: Load stack env
+  ansible.builtin.set_fact:
+    stack_env: "{{ lookup('community.sops.sops', playbook_dir ~ '/../secrets/stack.sops.env', input_type='dotenv', output_type='dotenv') }}"
+  no_log: true
+
+- name: SSH dir
+  ansible.builtin.file:
+    path: /root/.ssh
+    state: directory
+    mode: "0700"
+
+- name: Read-only deploy key
+  ansible.builtin.copy:
+    content: "{{ vm_secrets.deploy_key | trim }}\n"
+    dest: /root/.ssh/astral-wing-ro
+    mode: "0600"
+  no_log: true
+  diff: false
+
+- name: SSH alias for the repo
+  ansible.builtin.blockinfile:
+    path: /root/.ssh/config
+    create: true
+    mode: "0600"
+    marker: "# {mark} astral-wing (ansible)"
+    block: |
+      Host github-ro
+        HostName github.com
+        User git
+        IdentityFile /root/.ssh/astral-wing-ro
+        IdentitiesOnly yes
+
+- name: Pin GitHub host key
+  ansible.builtin.known_hosts:
+    path: /root/.ssh/known_hosts
+    name: github.com
+    key: github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl
+
+- name: Repo checkout
+  ansible.builtin.git:
+    repo: "{{ stack_repo }}"
+    dest: "{{ stack_dest }}"
+    version: main
+
+- name: Stack .env
+  ansible.builtin.copy:
+    content: "{{ stack_env }}\n{{ ('ACME_CA=' ~ stack_acme_ca ~ '\n') if stack_acme_ca is defined else '' }}"
+    dest: "{{ stack_dest }}/docker/.env"
+    mode: "0600"
+  no_log: true
+  diff: false
+
+- name: Stack up
+  community.docker.docker_compose_v2:
+    project_src: "{{ stack_dest }}/docker"
+    state: present
