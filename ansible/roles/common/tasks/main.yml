@@ -6,7 +6,7 @@
 
 - name: Base packages
   ansible.builtin.apt:
-    name: [qemu-guest-agent, unattended-upgrades, ca-certificates, curl, python3-debian]
+    name: [qemu-guest-agent, unattended-upgrades, ca-certificates, curl, python3-debian, rsync]
     update_cache: true
     cache_valid_time: 3600
     lock_timeout: 300
