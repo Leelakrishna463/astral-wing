@@ -50,7 +50,7 @@ services:
     volumes:
       - /mnt/docker/volumes/jellyfin-volume/config:/config
       - /mnt/docker/volumes/jellyfin-volume/cache:/cache
-      - /mnt/docker/volumes/jellyfin-volume/media:/media:ro
+      - /mnt/media:/media:ro
 
   dockhand:
     image: fnsys/dockhand:latest  # TODO: pin
