@@ -1,3 +1,7 @@
 .env
 *.env
 !secrets/*.sops.env
+tofu/.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
