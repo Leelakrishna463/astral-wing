@@ -1,8 +1,15 @@
+- name: Wait for cloud-init to finish (first boot)
+  ansible.builtin.command: cloud-init status --wait
+  changed_when: false
+  register: ci
+  failed_when: ci.rc not in [0, 2]
+
 - name: Base packages
   ansible.builtin.apt:
     name: [qemu-guest-agent, unattended-upgrades, ca-certificates, curl, python3-debian]
     update_cache: true
     cache_valid_time: 3600
+    lock_timeout: 300
 
 - name: Guest agent running
   ansible.builtin.service:
