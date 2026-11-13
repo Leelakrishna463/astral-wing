@@ -1,0 +1,32 @@
+- name: Data disks on the Proxmox host
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  become: false
+  tasks:
+    - name: Data LVs exist
+      community.general.lvol:
+        vg: data-vg
+        lv: "{{ hostvars[item.0].data_disk_lv_prefix | default('lv-') }}{{ item.1.name }}"
+        size: "{{ hostvars[item.0].data_disk_size | default(item.1.size) }}"
+        shrink: false
+      loop: "{{ groups['docker_hosts'] | product(data_disks) | list }}"
+      loop_control:
+        label: "{{ item.0 }}:{{ item.1.name }}"
+
+    - name: Attach to VM
+      ansible.builtin.shell: |
+        set -e
+        dev=/dev/data-vg/{{ lv }}
+        if qm config {{ vmid }} | grep -q "$dev,"; then echo present; exit 0; fi
+        qm set {{ vmid }} --scsi{{ idx }} "$dev,backup=0,serial={{ item.1.name }}"
+        echo attached
+      vars:
+        lv: "{{ hostvars[item.0].data_disk_lv_prefix | default('lv-') }}{{ item.1.name }}"
+        vmid: "{{ hostvars[item.0].vmid }}"
+        idx: "{{ data_disks.index(item.1) + 1 }}"
+      register: att
+      changed_when: "'attached' in att.stdout"
+      loop: "{{ groups['docker_hosts'] | product(data_disks) | list }}"
+      loop_control:
+        label: "{{ item.0 }}:{{ item.1.name }}"

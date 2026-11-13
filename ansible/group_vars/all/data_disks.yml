@@ -1,0 +1,4 @@
+data_disks:
+  - { name: appdata, mount: /mnt/docker/volumes, size: 40G }
+  - { name: photos,  mount: /mnt/photos,         size: 700G }
+  - { name: media,   mount: /mnt/media,          size: 150G }

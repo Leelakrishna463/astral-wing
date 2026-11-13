@@ -6,7 +6,7 @@ resource "proxmox_virtual_environment_vm" "vm" {
   pool_id         = "iac"
   on_boot         = each.value.on_boot
   started         = true
-  stop_on_destroy = true
+  stop_on_destroy = false
   scsi_hardware   = "virtio-scsi-single"
 
   agent {
@@ -47,6 +47,10 @@ resource "proxmox_virtual_environment_vm" "vm" {
 
   operating_system {
     type = "l26"
+  }
+
+  lifecycle {
+    ignore_changes = [disk]
   }
 
   initialization {

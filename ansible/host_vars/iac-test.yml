@@ -1,1 +1,3 @@
 stack_acme_ca: https://acme-staging-v02.api.letsencrypt.org/directory
+data_disk_lv_prefix: lv-test-
+data_disk_size: 4G

@@ -1,0 +1,32 @@
+- name: Find data disks by serial
+  ansible.builtin.shell: |
+    lsblk -dno NAME,SERIAL | awk -v s={{ item.name }} '$2==s{print "/dev/"$1}'
+  register: dd
+  changed_when: false
+  until: dd.stdout != ''
+  retries: 10
+  delay: 3
+  loop: "{{ data_disks }}"
+  loop_control:
+    label: "{{ item.name }}"
+
+- name: Filesystem only if blank
+  community.general.filesystem:
+    dev: "{{ item.stdout }}"
+    fstype: ext4
+    opts: "-m 0 -L {{ item.item.name }}"
+    resizefs: true
+  loop: "{{ dd.results }}"
+  loop_control:
+    label: "{{ item.item.name }}"
+
+- name: Mount by label
+  ansible.posix.mount:
+    path: "{{ item.mount }}"
+    src: "LABEL={{ item.name }}"
+    fstype: ext4
+    opts: defaults,nofail,noatime
+    state: mounted
+  loop: "{{ data_disks }}"
+  loop_control:
+    label: "{{ item.name }}"
