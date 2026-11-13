@@ -24,5 +24,11 @@ variable "vms" {
     memory  = number
     disk_gb = number
     on_boot = bool
+    mac     = optional(string)
   }))
+}
+
+variable "admin_ssh_keys" {
+  type    = list(string)
+  default = []
 }

@@ -36,7 +36,8 @@ resource "proxmox_virtual_environment_vm" "vm" {
   }
 
   network_device {
-    bridge = "vmbr0"
+    bridge      = "vmbr0"
+    mac_address = each.value.mac
   }
 
   serial_device {}
@@ -66,7 +67,7 @@ resource "proxmox_virtual_environment_vm" "vm" {
     }
     user_account {
       username = "lee"
-      keys     = [trimspace(file(var.ssh_public_key_file))]
+      keys     = concat([trimspace(file(var.ssh_public_key_file))], var.admin_ssh_keys)
     }
   }
 }

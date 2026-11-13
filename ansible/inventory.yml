@@ -3,3 +3,6 @@
     "iac-test":
       "ansible_host": "192.168.0.150"
       "vmid": 9100
+    "wing-udock":
+      "ansible_host": "192.168.0.103"
+      "vmid": 110
